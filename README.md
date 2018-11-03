@@ -1,2 +1,1 @@
-# RestoApp
-ECSE223 Group Project
+# Group06

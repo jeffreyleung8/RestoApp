@@ -1,0 +1,178 @@
+external interface Serializable {}
+
+class RestoApp {
+  depend java.io.Serializable;
+  isA Serializable;
+  private static final long serialVersionUID = -2683593616927798071L;
+  
+  public void reinitialize() {
+    Reservation.reinitializeAutouniqueResNumber(this.getReservations());
+    Order.reinitializeAutouniqueNumber(this.getOrders());
+    MenuItem.reinitializeUniqueMenuItemName(this.menu.getMenuItems());
+    Table.reinitializeUniqueNumber(this.getTables());
+  }
+}
+
+class Reservation {
+  depend java.io.Serializable;
+  depend java.time.LocalDateTime;
+
+  depend java.time.format.DateTimeFormatter;
+  
+  isA Serializable;
+  private static final long serialVersionUID = 2315072607928790501L;
+  
+  public static void reinitializeAutouniqueResNumber(List<Reservation> reservations) {
+    int nextNumber = 0; 
+    for (Reservation reservation : reservations) {
+      if (reservation.getReservationNumber() > nextNumber) {
+        nextNumber = reservation.getReservationNumber();
+      }
+    }
+    nextNumber++;
+  }
+  
+   public boolean checkOverlap(Date aDate, Time aTime){
+    LocalDateTime aDateTime = LocalDateTime.parse(aDate + " " + aTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+	    LocalDateTime dateTime = LocalDateTime.parse(date + " " + time, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+	    LocalDateTime aNewDateTime = aDateTime.plusHours(2);
+	    LocalDateTime newDateTime = dateTime.plusHours(2);
+
+	   if(aNewDateTime.isBefore(dateTime) || aDateTime.isAfter(newDateTime)) {
+		   return false;
+	   }
+	  	return true;
+  }
+   
+   public String toString(){
+	   
+	return "Reservation #" + this.getReservationNumber() + " | Name : " + this.getContactName();
+  }
+  
+}
+
+class Table {
+  depend java.io.Serializable;
+  isA Serializable;
+  private static final long serialVersionUID = 8896099581655989380L;
+  
+  public static void reinitializeUniqueNumber(List<Table> tables) {
+    tablesByNumber = new HashMap<Integer, Table>();
+    for (Table table : tables) {
+      tablesByNumber.put(table.getNumber(), table);
+    }
+  }
+  public String toString() {
+	  return "Table #" + this.getNumber();
+   }  
+   
+   public boolean checkOverlap(int x, int y, int length, int width) {
+	  
+	  boolean xOverlap = (Math.abs(2 * x - 2* this.x + length - this.length) < (length + this.length));
+	  boolean yOverlap = (Math.abs(2 * y - 2* this.y + width - this.width) < (width + this.width));
+	  return (xOverlap && yOverlap);
+
+  }
+}
+
+class Seat {
+  depend java.io.Serializable;
+  isA Serializable;
+  private static final long serialVersionUID = 386717977557499839L;
+}
+
+class Order {
+  depend java.io.Serializable;
+  isA Serializable;
+  private static final long serialVersionUID = -3900912597282882073L;
+  
+  public static void reinitializeAutouniqueNumber(List<Order> orders) {
+    nextNumber = 0; 
+    for (Order order : orders) {
+      if (order.getNumber() > nextNumber) {
+        nextNumber = order.getNumber();
+      }
+    }
+    nextNumber++;
+  }
+   public String toString(){
+    List<Table> tables = this.getTables();
+    boolean isTakeOut = true;
+    
+	   String tableList = " : Tables ";
+	   for (Table table : tables) {
+		   if (isTakeOut == true){
+			   if (table instanceof TakeOut) {
+				   tableList = " : Take Out";
+				   break;
+			   } else {
+				   isTakeOut = false;
+			   }
+		   }
+			   
+		   tableList += "#" + table.getNumber() + " ";
+	   }
+	   
+	return "Order # " + this.getNumber() + tableList;
+  }
+}
+
+class OrderItem {
+  depend java.io.Serializable;
+  isA Serializable;
+  private static final long serialVersionUID = 2045406856025012133L;
+  
+	public String toString() {
+	  return String.format("%d\u00D7 %s | Order # %d", quantity, getPricedMenuItem().getMenuItem().getName(), getOrder().getNumber());
+	}
+  
+}
+
+class Menu {
+  depend java.io.Serializable;
+  isA Serializable;
+  private static final long serialVersionUID = -7403802774454467836L;
+  
+  public boolean checkItemName(String str){
+	  for(MenuItem menuItem : menuItems){
+		  if(menuItem.getName().equals(str)){
+			  return false;
+		  }
+	  }
+	  return true;
+  }
+}
+
+class MenuItem {
+  depend java.io.Serializable;
+  isA Serializable;
+  private static final long serialVersionUID = -1776230320092632776L;
+  
+    public static void reinitializeUniqueMenuItemName(List<MenuItem> menuItems) {
+    HashMap<String, MenuItem> menuItemsByName = new HashMap<String, MenuItem>();
+    for (MenuItem menuItem : menuItems) {
+    	menuItemsByName.put(menuItem.getName(), menuItem);
+    }
+  }
+  public String toString() {
+	  return getName();
+   }
+
+
+
+}
+
+class PricedMenuItem {
+  depend java.io.Serializable;
+  isA Serializable;
+  private static final long serialVersionUID = -4855219931984388104L;
+  
+}
+
+class Bill {
+  depend java.io.Serializable;
+  isA Serializable;
+  private static final long serialVersionUID = 1301576255893682821L;
+}
+
+
